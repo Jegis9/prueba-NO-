@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kilometraje de Unidades</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+  </head>
+  <body>
+    <h1>Kilometraje de Unidades</h1>
+    <table border="1">
+      <thead>
+        <tr>
+          <th>Unidad</th>
+          <th>Kilómetros Recorridos</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for unidad in unidades_km %}
+        <tr {% if unidad.total_km>
+          = 3500 %} style="background-color: #ffcccc;" {% endif %}>
+          <td>{{ unidad.unidad__nombre }}</td>
+          <td>{{ unidad.total_km }} km</td>
+          <td>
+            {% if unidad.total_km >= 3500 %}
+            <strong>Próxima a Mantenimiento</strong>
+            {% else %}
+            <span>En condiciones</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="3">No hay datos de kilometraje disponibles.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </body>
+</html>

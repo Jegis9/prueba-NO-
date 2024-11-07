@@ -1,0 +1,295 @@
+{% extends "baseG.html" %} {% load static %} {% block body %}
+<div class="container mt-5">
+  <h2 class="mb-4">Lista de Servicios de Ambulancia</h2>
+
+  <a href="{% url 'prueba_catr' %}" class="btn btn-primary"
+    >Listar categorias</a
+  >
+  <table id="myTable" class="table table-striped table-bordered border-success">
+    <thead class="table-dark">
+      <tr>
+        <th class="header-cell w-5">Servicio:</th>
+        <th class="header-cell w-5">Fecha y Hora:</th>
+        <th class="header-cell w-5">Servicio de:</th>
+        <th class="header-cell w-5">Jefe de Servicio</th>
+        <th class="header-cell w-5">Autorizado Por:</th>
+        <th class="header-cell w-5">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for ambulancias in ambulancias %}
+      <tr>
+        <td>{{ ambulancias.servicio.estacion }}</td>
+        <td>{{ ambulancias.servicio.fecha_hora }}</td>
+        <td>{{ ambulancias.servicio.servicio }}</td>
+        <td>{{ ambulancias.servicio.piloto }}</td>
+        <td>{{ ambulancias.jefe_servicio }}</td>
+        <td>
+          <!-- Botón para abrir el modal -->
+          <button
+            class="btn btn-warning"
+            type="button"
+            data-bs-toggle="modal"
+            data-bs-target="#modalAmbulancia{{ ambulancias.id }}"
+          >
+            <i class="bi bi-eye"></i> Ver Detalles
+          </button>
+          <!-- Botón para Editar -->
+          <a
+            href="{% url 'editar_servicio_ambulancia' ambulancias.servicio.id ambulancias.id %}"
+            class="btn btn-primary btn-sm"
+          >
+            <i class="bi bi-pencil-square"></i>
+          </a>
+
+          <!-- Formulario para Eliminar -->
+          <!-- Formulario para Eliminar cada herramienta -->
+          <form
+            action="{% url 'eliminar_servicio_ambulancia' ambulancias.id %}"
+            method="post"
+            style="display: inline"
+            id="deleteForm-{{ ambulancias.id }}"
+          >
+            {% csrf_token %}
+            <button
+              type="button"
+              class="btn btn-danger btn-sm"
+              onclick="confirmDelete('{{ ambulancias.id }}')"
+            >
+              <i class="bi bi-trash-fill"></i>
+            </button>
+          </form>
+        </td>
+      </tr>
+
+      <!-- Modal para cada servicio de Ambulancias -->
+      <div
+        class="modal fade"
+        id="modalAmbulancia{{ ambulancias.id }}"
+        tabindex="-1"
+        aria-labelledby="modalAmbulanciaLabel{{ ambulancias.id }}"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header bg-warning">
+              <h5
+                class="modal-title"
+                id="modalAmbulanciaLabel{{ ambulancias.id }}"
+              >
+                Detalles del Servicio de Ambulancia
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Cerrar"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <form>
+                <div class="row">
+                  <!-- Información General -->
+                  <div class="col-md-6">
+                    <h6>Información General</h6>
+                    <div class="mb-3">
+                      <label class="form-label"
+                        ><strong>Estación:</strong>
+                        {{ambulancias.servicio.estacion}}</label
+                      >
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label"
+                        ><strong>Turno:</strong>
+                        {{ambulancias.servicio.turno}}</label
+                      >
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label"
+                        ><strong>Dirección:</strong>
+                        {{ambulancias.servicio.direccion}}</label
+                      >
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label"
+                        ><strong>Telefonista:</strong>
+                        {{ambulancias.servicio.telefonista}}</label
+                      >
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label"
+                        ><strong>Bombero Reporta:</strong>
+                        {{ambulancias.servicio.bombero_reporta}}</label
+                      >
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label"
+                        ><strong>Unidad:</strong>
+                        {{ambulancias.servicio.unidad}}</label
+                      >
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label"
+                        ><strong>Piloto:</strong>
+                        {{ambulancias.servicio.piloto}}</label
+                      >
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label"
+                        ><strong>Hora Salida:</strong>
+                        {{ambulancias.servicio.salida_hora|date:'Y-m-d\\TH:i'}}</label
+                      >
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label"
+                        ><strong>Hora Entrada:</strong>
+                        {{ambulancias.servicio.entrada_hora|date:'Y-m-d\\TH:i'}}</label
+                      >
+                    </div>
+                  </div>
+                  <!-- Información Específica de Ambulancia -->
+                  <div class="col-md-6">
+                    <h6>Detalles de Ambulancia</h6>
+                    <div class="mb-3">
+                      <label class="form-label"
+                        ><strong>Código de Emergencia:</strong>
+                        {{ambulancias.codigo_emergencia}}</label
+                      >
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label"
+                        ><strong>Nombre del Paciente:</strong>
+                        {{ambulancias.nombre_paciente}}</label
+                      >
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label"
+                        ><strong>Dirección del Paciente:</strong>
+                        {{ambulancias.direccion_paciente }}</label
+                      >
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label"
+                        ><strong>Edad:</strong> {{ ambulancias.edad }}</label
+                      >
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label"
+                        ><strong>Sexo:</strong> {{ ambulancias.sexo }}</label
+                      >
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label"
+                        ><strong>Traslado a:</strong>
+                        {{ambulancias.traslado_a}}</label
+                      >
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label"
+                        ><strong>Forma de Aviso:</strong>
+                        {{ambulancias.forma_aviso }}</label
+                      >
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label"
+                        ><strong>Hora Efectiva del Servicio:</strong>
+                        {{ambulancias.hora_efectiva_servicio|time:'TH:i'}}
+                      </label>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="mb-3">
+                        <label class="form-label"
+                          ><strong>Km entrada:</strong></label
+                        >
+                        <p>{{ ambulancias.servicio.km_entrada }}</p>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="mb-3">
+                        <label class="form-label"
+                          ><strong>Km salida:</strong></label
+                        >
+                        <p>{{ ambulancias.servicio.km_salida }}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-4">
+                      <div class="mb-3">
+                        <label class="form-label"
+                          ><strong>Km recorridos:</strong></label
+                        >
+                        <p>{{ ambulancias.servicio.km_recorridos }}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Observaciones -->
+                <div class="mb-3">
+                  <label class="form-label"
+                    ><strong>Observaciones:</strong></label
+                  >
+                  <p>{{ ambulancias.servicio.observaciones }}</p>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <a
+                href="{% url 'generar_reporte_ambulancia' ambulancias.id %}"
+                class="btn btn-success"
+              >
+                Descargar
+              </a>
+              <!-- <button
+                type="button"
+                class="btn btn-danger"
+                data-bs-dismiss="modal"
+                onclick="return confirm('¿Está seguro de que desea desactivar este servicio?')"
+              >
+                Desactivar
+              </button>
+              <button
+                type="button"
+                class="btn btn-primary"
+                data-bs-toggle="modal"
+                data-bs-target="#editarAmbulancia{{ ambulancias.id }}"
+              >
+                Editar
+              </button> -->
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<script>
+  function confirmDelete(codigo_her) {
+    // Usamos SweetAlert para mostrar una alerta personalizada
+    Swal.fire({
+      title: "¿Estás seguro?",
+      text: "No podrás revertir esta acción",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Sí, eliminarlo",
+      cancelButtonText: "Cancelar",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Si el usuario confirma, enviamos el formulario específico por su ID
+        document.getElementById(`deleteForm-${codigo_her}`).submit();
+      }
+    });
+  }
+</script>
+{% endblock %}

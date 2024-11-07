@@ -1,0 +1,297 @@
+{% extends "baseG.html" %} {% load static %} {% block body %}
+<div class="container mt-5">
+  <h2 class="mb-4">Lista de Servicios de Incendios</h2>
+
+  <a href="{% url 'add' %}" class="btn btn-primary">Volver</a>
+  <table id="myTable" class="table table-striped table-bordered border-success">
+    <thead class="table-dark">
+      <tr>
+        <th class="header-cell w-5">Servicio:</th>
+
+        <th class="header-cell w-5">Fecha y Hora:</th>
+        <th class="header-cell w-5">Servicio de:</th>
+        <th class="header-cell w-5">Jefe de Servicio</th>
+        <th class="header-cell w-5">Autorizado Por:</th>
+
+        <th class="header-cell w-5">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for incendios in incendios %}
+      <tr>
+        <td>{{ incendios.servicio.estacion }}</td>
+
+        <td>{{ incendios.servicio.fecha_hora }}</td>
+        <td>{{ incendios.servicio.servicio }}</td>
+        <td>{{ incendios.servicio.piloto }}</td>
+        <td>{{ incendios.jefe_servicio }}</td>
+        <td>
+          <!-- Botón para abrir el modal -->
+          <button
+            class="btn btn-warning"
+            type="button"
+            data-bs-toggle="modal"
+            data-bs-target="#modalIncendios{{ incendios.id }}"
+          >
+            <i class="bi bi-eye"></i> Ver Detalles
+          </button>
+          <!-- Botón para Editar -->
+          <a
+            href="{% url 'editar_servicio_incendios' incendios.servicio.id incendios.id %}"
+            class="btn btn-primary btn-sm"
+          >
+            <i class="bi bi-pencil-square"></i>
+          </a>
+
+          <!-- Formulario para Eliminar -->
+          <!-- Formulario para Eliminar cada herramienta -->
+          <form
+            action="{% url 'eliminar_servicio_incendios' incendios.id %}"
+            method="post"
+            style="display: inline"
+            id="deleteForm-{{ incendios.id }}"
+          >
+            {% csrf_token %}
+            <button
+              type="button"
+              class="btn btn-danger btn-sm"
+              onclick="confirmDelete('{{ incendios.id }}')"
+            >
+              <i class="bi bi-trash-fill"></i>
+            </button>
+          </form>
+        </td>
+      </tr>
+
+      <!-- Modal para cada servicio de Incendios -->
+      <div
+        class="modal fade"
+        id="modalIncendios{{ incendios.id }}"
+        tabindex="-1"
+        aria-labelledby="modalIncendiosLabel{{ incendios.id }}"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header bg-warning">
+              <h5
+                class="modal-title"
+                id="modalIncendiosLabel{{ incendios.id }}"
+              >
+                Detalles del Servicio de Incendios
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Cerrar"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <form>
+                <div class="row">
+                  <!-- Información General -->
+                  <div class="col-md-6">
+                    <h6>Información General</h6>
+                    <div class="mb-3">
+                      <label class="form-label"
+                        ><strong>Estación:</strong>
+                        {{incendios.servicio.estacion }}</label
+                      >
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label"
+                        ><strong>Turno:</strong>
+                        {{incendios.servicio.turno}}
+                      </label>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label"
+                        ><strong>Dirección:</strong>
+                        {{incendios.servicio.direccion }}</label
+                      >
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label"
+                        ><strong>Telefonista:</strong>
+                        {{incendios.servicio.telefonista }}</label
+                      >
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label"
+                        ><strong>Bombero Reporta:</strong>
+                        {{incendios.servicio.bombero_reporta }}</label
+                      >
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label"
+                        ><strong>Unidad:</strong> {{incendios.servicio.unidad}}
+                      </label>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label"
+                        ><strong>Piloto:</strong> {{incendios.servicio.piloto}}
+                      </label>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label"
+                        ><strong>Hora Salida:</strong>
+                        {{incendios.servicio.salida_hora|date:'Y-m-d\\TH:i'}}</label
+                      >
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label"
+                        ><strong>Hora Entrada:</strong>
+                        {{incendios.servicio.entrada_hora|date:'Y-m-d\\TH:i'}}</label
+                      >
+                    </div>
+                  </div>
+                  <!-- Información Específica de Incendios -->
+                  <div class="col-md-6">
+                    <h6>Detalles de Incendios</h6>
+                    <div class="mb-3">
+                      <label class="form-label"
+                        ><strong>Servicio de:</strong>
+                        {{incendios.servicio_incendio_inmueble }}</label
+                      >
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label"
+                        ><strong>Jefe de Servicio:</strong> {{ incendios.valor}}
+                      </label>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label"
+                        ><strong>Servicio Autorizado Por:</strong>
+                        {{incendios.perdida }}</label
+                      >
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label"
+                        ><strong>Unidades Asistentes:</strong>
+                        {{incendios.unidades_asistentes_otras_estaciones}}
+                      </label>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label"
+                        ><strong>Unidades Policiacas:</strong>
+                        {{incendios.unidades_policiacas }}</label
+                      >
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label"
+                        ><strong>Otras Instituciones Bomberiles:</strong>
+                        {{incendios.unidades_otras_instituciones_bomberiles}}
+                      </label>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label"
+                        ><strong
+                          >Personal Asistente en Otras Estaciones:</strong
+                        >
+                        {{ incendios.personal_asistente_otras_estaciones}}
+                      </label>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label"
+                        ><strong>Fecha:</strong>
+                        {{incendios.fecha|date:'Y-m-d'}}
+                      </label>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="mb-3">
+                        <label class="form-label"
+                          ><strong>Km entrada:</strong></label
+                        >
+                        <p>{{ incendios.servicio.km_entrada }}</p>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="mb-3">
+                        <label class="form-label"
+                          ><strong>Km salida:</strong></label
+                        >
+                        <p>{{ incendios.servicio.km_salida }}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-4">
+                      <div class="mb-3">
+                        <label class="form-label"
+                          ><strong>Km recorridos:</strong></label
+                        >
+                        <p>{{ incendios.servicio.km_recorridos }}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Observaciones -->
+                <div class="mb-3">
+                  <label class="form-label"
+                    ><strong>Observaciones:</strong></label
+                  >
+                  <p>{{ incendios.servicio.observaciones }}</p>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <a
+                href="{% url 'generar_reporte_incendios' incendios.id %}"
+                class="btn btn-success"
+              >
+                Descargar
+              </a>
+              <!-- <button
+                type="button"
+                class="btn btn-danger"
+                data-bs-dismiss="modal"
+                onclick="return confirm('¿Está seguro de que desea desactivar este servicio?')"
+              >
+                Desactivar
+              </button>
+              <button
+                type="button"
+                class="btn btn-primary"
+                data-bs-toggle="modal"
+                data-bs-target="#editarIncendios{{ incendios.id }}"
+              >
+                Editar
+              </button> -->
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<script>
+  function confirmDelete(codigo_her) {
+    // Usamos SweetAlert para mostrar una alerta personalizada
+    Swal.fire({
+      title: "¿Estás seguro?",
+      text: "No podrás revertir esta acción",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Sí, eliminarlo",
+      cancelButtonText: "Cancelar",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Si el usuario confirma, enviamos el formulario específico por su ID
+        document.getElementById(`deleteForm-${codigo_her}`).submit();
+      }
+    });
+  }
+</script>
+{% endblock %}
