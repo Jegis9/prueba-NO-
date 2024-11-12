@@ -135,7 +135,7 @@ from decouple import config
 # }
 
 DATABASES = {
-    'default': dj_database_url.parse("postgresql://bomberosm_user:3VDIyx67DlZdjQJP9nTq2RDaXBz8r92P@dpg-cspe53hu0jms73bjhdgg-a.oregon-postgres.render.com/bomberosm")
+    'default': dj_database_url.parse('DATABASE_URL')
 }
 
 
