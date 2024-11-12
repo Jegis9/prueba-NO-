@@ -1,6 +1,7 @@
 # your_app/models.py
 
 from django.db import models
+from django.contrib.auth.models import User
 from Aplicaciones.Vehiculos.models import Vehiculos
 class Servicio(models.Model):
     SERVICIO_CHOICES = [
@@ -11,11 +12,23 @@ class Servicio(models.Model):
     estacion = models.CharField(max_length=50)
     turno = models.CharField(max_length=50)
     direccion = models.CharField(max_length=255)
-    telefonista = models.CharField(max_length=100)
-    bombero_reporta = models.CharField(max_length=100)
-    unidad = models.CharField(max_length=50)
+    telefonista =  models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        related_name='servicios_telefonista'
+    )
+    bombero_reporta = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        related_name='servicios_reporta'
+    )
+    
     unidad = models.ForeignKey(Vehiculos, on_delete=models.CASCADE, related_name='servicios')  # Relación con Vehiculos
-    piloto = models.CharField(max_length=50)
+    piloto = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        related_name='servicios_piloto'
+    )
     salida_hora = models.DateTimeField()
     entrada_hora = models.DateTimeField()
     personal_asistente = models.CharField(max_length=100)

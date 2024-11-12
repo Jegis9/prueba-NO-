@@ -18,6 +18,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
+from collections import defaultdict
+from django.shortcuts import render
+from .models import Ambulancia, Categorias_emergencias
 
 
 def prueba_catr(request):
@@ -147,9 +150,6 @@ def is_admin_or_staff(user):
 
 logo_derecha = finders.find('img/images.png')
 
-from collections import defaultdict
-from django.shortcuts import render
-from .models import Ambulancia, Categorias_emergencias
 
 def reporte_ambulancia(request):
     # Obtenemos todos los registros de Ambulancia
@@ -317,6 +317,86 @@ def vista_kilometraje(request):
     return render(request, 'vista_kilometraje.html', {'servicios': servicios})
 
 
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.core.mail import send_mail
+from django.conf import settings
+from django.db.models import Sum
+from Aplicaciones.Emergencias.models import Servicio
+from Aplicaciones.Vehiculos.models import Mantenimientos_km
+from Aplicaciones.Vehiculos.models import Vehiculos
+
+def marcar_mantenimiento(request, unidad_id):
+    if request.method == 'POST':
+        unidad = Vehiculos.objects.get(id=unidad_id)
+        km_actuales = Servicio.objects.filter(
+            unidad=unidad,
+            activo=True
+        ).aggregate(Sum('km_recorridos'))['km_recorridos__sum'] or 0
+        
+        # Registrar el mantenimiento
+        Mantenimientos_km.objects.create(
+            unidad=unidad,
+            km_al_momento=km_actuales,
+            notas=request.POST.get('notas', '')
+        )
+        
+        messages.success(request, f"Mantenimiento registrado para la unidad {unidad}")
+        return redirect('alertas')
+
+def alertas(request):
+    # Obtener servicios activos
+    servicios = Servicio.objects.filter(activo=True)
+    
+    # Calcular los kilómetros totales por cada unidad desde último mantenimiento
+    unidades_km = {}
+    
+    # Primero obtener todas las unidades únicas de los servicios activos
+    unidades_unicas = Vehiculos.objects.filter(servicios__activo=True).distinct()
+    
+    for unidad in unidades_unicas:
+        # Obtener el último mantenimiento para esta unidad
+        ultimo_mantenimiento = Mantenimientos_km.objects.filter(
+            unidad=unidad
+        ).order_by('-fecha').first()
+        
+        # Si hay un último mantenimiento, sumar solo los km después de ese mantenimiento
+        if ultimo_mantenimiento:
+            km_desde_mantenimiento = 0
+            servicios_posteriores = Servicio.objects.filter(
+                unidad=unidad,
+                activo=True,
+                fecha_hora__gt=ultimo_mantenimiento.fecha
+            )
+            
+            for servicio in servicios_posteriores:
+                km_desde_mantenimiento += servicio.km_recorridos
+        else:
+            # Si no hay mantenimiento previo, sumar todos los km
+            km_desde_mantenimiento = Servicio.objects.filter(
+                unidad=unidad,
+                activo=True
+            ).aggregate(Sum('km_recorridos'))['km_recorridos__sum'] or 0
+        
+        unidades_km[unidad] = km_desde_mantenimiento
+        
+        # Verificar si la unidad está cerca del límite de mantenimiento (3000 km)
+        if km_desde_mantenimiento >= 3000:
+            send_mail(
+                subject='Alerta de Mantenimiento para Unidad',
+                message=f'La unidad {unidad} ha alcanzado {km_desde_mantenimiento} km desde su último mantenimiento. Se recomienda realizar mantenimiento.',
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=['forniteb6@gmail.com'],
+                fail_silently=False,
+            )
+            messages.warning(
+                request,
+                f"Alerta: la unidad {unidad} necesita mantenimiento. Kilómetros desde último mantenimiento: {km_desde_mantenimiento}."
+            )
+    
+    return render(request, 'vista_kilometraje.html', {
+        'unidades_km': unidades_km,
+    })
 
 @login_required
 @user_passes_test(is_admin_or_staff, login_url='error')

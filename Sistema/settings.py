@@ -21,6 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
@@ -32,10 +33,12 @@ SECRET_KEY = config('SECRET_KEY')
 # DEBUG = True
 
 # ALLOWED_HOSTS = []
-DEBUG = config('DEBUG', default=False, cast=bool)
+DEBUG = config('DEBUG', default=True, cast=bool)
+
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='').split(' ')
 
 
-ALLOWED_HOSTS = ['127.0.0.1','localhost',"prueba-no.onrender.com"]
+# ['127.0.0.1','localhost',"prueba-no.onrender.com"]
 # Application definition
 
 INSTALLED_APPS = [
@@ -50,7 +53,6 @@ INSTALLED_APPS = [
     'Aplicaciones.Publico',
     'Aplicaciones.emergenciasRecibidas',
     'Aplicaciones.lUsuarios',
-    'Aplicaciones.Personal',
     'Aplicaciones.Vehiculos',
     'Aplicaciones.EPP',
     'Aplicaciones.Herramientas',
@@ -63,8 +65,12 @@ INSTALLED_APPS = [
     'requests',
     'storages',
     'cloudinary', 
+
    
 ]
+
+
+
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
 MIDDLEWARE = [
@@ -111,12 +117,26 @@ WSGI_APPLICATION = 'Sistema.wsgi.application'
 import dj_database_url
 from decouple import config
 
-DATABASES = {
-    'default': dj_database_url.parse(
-        config('DATABASE_URL')  # 'postgresql://user:password@host:port/database'
-    )
-}
+# DATABASES = {
+#     'default': dj_database_url.parse(
+#         config('DATABASE_URL')  # 'postgresql://user:password@host:port/database'
+#     )
+# }
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'pruebaBMT',
+#         'USER': 'postgres',
+#         'PASSWORD': 'admin123',
+#         'HOST': 'localhost',
+#         'PORT': '5432',  # Puedes establecer un valor por defecto
+#     }
+# }
+
+DATABASES = {
+    'default': dj_database_url.parse("postgresql://bomberosm_user:3VDIyx67DlZdjQJP9nTq2RDaXBz8r92P@dpg-cspe53hu0jms73bjhdgg-a.oregon-postgres.render.com/bomberosm")
+}
 
 
 # Password validation

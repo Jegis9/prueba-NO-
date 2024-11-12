@@ -104,35 +104,3 @@ def editar_vehiculos(request, codigo_vehiculo):
     return render(request, 'editar_vehiculo.html', {'form': form})
 
 
-# from django.contrib.auth.decorators import login_required, user_passes_test
-# from django.core.mail import send_mail
-# from django.db.models import Sum
-# from django.shortcuts import render
-# from django.conf import settings
-# from .models import Servicio, Vehiculos
-
-# @login_required
-# @user_passes_test(is_admin_or_staff, login_url='error')
-# def vista_kilometraje(request):
-#     # Agrupar los servicios por unidad y calcular el kilometraje total por unidad
-#     unidades_km = Servicio.objects.filter(activo=True).values('unidad__id', 'unidad__nombre').annotate(total_km=Sum('km_recorridos'))
-
-#     # Lista para almacenar las unidades próximas a los 3500 km
-#     unidades_proximas_a_mantenimiento = []
-
-#     # Verificar si alguna unidad está cerca de los 3500 km
-#     for unidad in unidades_km:
-#         if unidad['total_km'] >= 3500:
-#             unidades_proximas_a_mantenimiento.append(unidad)
-    
-#     # Enviar un correo si hay unidades próximas a mantenimiento
-#     if unidades_proximas_a_mantenimiento:
-#         subject = 'Notificación de Mantenimiento de Vehículos'
-#         message = 'Las siguientes unidades están próximas a los 3500 km y requieren mantenimiento:\n\n'
-#         for unidad in unidades_proximas_a_mantenimiento:
-#             message += f"Unidad: {unidad['unidad__nombre']} - Kilometraje: {unidad['total_km']} km\n"
-        
-#         recipient_list = ['forniteb6@gmail.com']  # Reemplaza con el correo deseado
-#         send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, recipient_list)
-
-#     return render(request, 'vista_kilometraje.html', {'unidades_km': unidades_km})

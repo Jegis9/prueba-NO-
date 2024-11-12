@@ -9,7 +9,6 @@ from cloudinary.models import CloudinaryField
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     pdi = models.CharField(max_length=20, null=True, blank=True)
-
     name1 = models.CharField(max_length=100)
     name2 = models.CharField(max_length=100, blank=True, null=True)
     lastname1 = models.CharField(max_length=100)

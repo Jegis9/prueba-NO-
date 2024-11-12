@@ -4,7 +4,7 @@
 
 from django import forms
 from .models import Servicio, Varios, Ambulancia, Incendios, Categorias_emergencias
-
+from django.contrib.auth.models import User
 class ServicioForm(forms.ModelForm):
     class Meta:
         model = Servicio
@@ -20,7 +20,15 @@ class ServicioForm(forms.ModelForm):
             'entrada_hora': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
             'servicio': forms.RadioSelect,  # Renderizar como botones de radio
         }
-
+    def __init__(self, *args, **kwargs):
+        super(ServicioForm, self).__init__(*args, **kwargs)
+        # Filtrar para mostrar solo usuarios internos en los campos de usuario
+        internal_users = User.objects.filter(profile__is_internal=True)
+        
+        self.fields['telefonista'].queryset = internal_users
+        self.fields['bombero_reporta'].queryset = internal_users
+        self.fields['piloto'].queryset = internal_users
+        
 class VariosForm(forms.ModelForm):
     servicio_de = forms.CharField(
         max_length=100, 

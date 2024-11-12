@@ -1,0 +1,22 @@
+{% extends "baseG.html" %} {% load static %} {% load crispy_forms_tags %}
+{%block body %} {% if unidades_km %} {% for unidad, km in unidades_km.items %}
+<div class="unidad-container">
+  <p>
+    Unidad: {{ unidad }} - Kilómetros recorridos desde último mantenimiento:
+    {{km}}
+  </p>
+
+  {% if km >= 3000 %}
+  <form method="POST" action="{% url 'marcar_mantenimiento' unidad.id %}">
+    {% csrf_token %}
+    <textarea
+      name="notas"
+      placeholder="Notas de mantenimiento (opcional)"
+    ></textarea>
+    <button type="submit" class="btn btn-primary">Marcar como Mantenido</button>
+  </form>
+  {% endif %}
+</div>
+{% endfor %} {% else %}
+<h1>No hay unidades para mostrar</h1>
+{% endif %} {% endblock %}
